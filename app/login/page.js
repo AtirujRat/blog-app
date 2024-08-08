@@ -3,12 +3,15 @@ import axios from "axios";
 import { useState, useEffect, useContext } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import GoogleLogin from "react-google-login";
-import { gapi } from "gapi-script";
+
 import AuthContext from "../api/context/authContext";
 import { motion } from "framer-motion";
 import AlertMessage from "../components/alert/AlertMessage";
 import AlertContext from "../api/context/alertContext";
+import dynamic from "next/dynamic";
+const GoogleLogin = dynamic(() => import("react-google-login"), {
+  ssr: false,
+});
 
 export default function Home() {
   const [email, setEmail] = useState();
@@ -24,13 +27,19 @@ export default function Home() {
     "640712928576-j08cmre7sj91s1lvqtbrq35i4dc0cbs1.apps.googleusercontent.com";
 
   useEffect(() => {
-    function initClient() {
-      gapi.client.init({
-        clientId: clientId,
-        scope: "",
+    if (typeof window !== "undefined") {
+      // Import gapi-script only on the client-side
+      import("gapi-script").then((gapiScript) => {
+        const gapi = gapiScript.gapi;
+        function initClient() {
+          gapi.client.init({
+            clientId: clientId,
+            scope: "",
+          });
+        }
+        gapi.load("client:auth2", initClient);
       });
     }
-    gapi.load("client:auth2", initClient);
   }, []);
 
   async function loginForm(e) {
