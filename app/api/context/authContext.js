@@ -23,13 +23,33 @@ export function AuthContextProvider({ children }) {
     }
   }
 
+  async function getUserEmail() {
+    try {
+      const response = await axios.get("/api/users/getonlyemail");
+      return response.data.data;
+    } catch {
+      alert("Error from supabase");
+    }
+  }
+
+  const isTokenExpired = (token) => {
+    if (!token) return true;
+
+    const decodedToken = JSON.parse(atob(token.split(".")[1]));
+    const expiryTime = decodedToken.exp * 1000; // Convert to milliseconds
+
+    return Date.now() > expiryTime;
+  };
+
   useEffect(() => {
     const authToken = localStorage.getItem("token");
     const data = verifyToken(authToken);
-    if (authToken) {
-      setUser(data);
-    } else {
+    if (isTokenExpired(authToken)) {
+      localStorage.removeItem("token");
       setUser(null);
+      setUserData({});
+    } else if (authToken && data) {
+      setUser(data);
     }
   }, []);
 
@@ -37,20 +57,9 @@ export function AuthContextProvider({ children }) {
     alert("something went wrong");
   }
 
-  async function onSuccess(res) {
-    const users = await axios.post("/api/users/loginwithgoogle", {
-      email: res.profileObj.email,
-      name: res.profileObj.name,
-      image_url: res.profileObj.imageUrl,
-    });
-
-    localStorage.setItem("token", users.data.token);
-    router.push("/");
-  }
-
   return (
     <AuthContext.Provider
-      value={{ onSuccess, onFailure, user, userData, setUserData }}
+      value={{ onFailure, user, userData, setUserData, getUserEmail }}
     >
       {children}
     </AuthContext.Provider>

@@ -2,7 +2,7 @@ import AlertContext from "@/app/api/context/alertContext";
 import { motion } from "framer-motion";
 import React, { useState, useEffect, useContext } from "react";
 
-function AlertMessage({ message, type }) {
+export default function AlertMessage({ message, type }) {
   const { isAlertOpened, setIsAlertOpened } = useContext(AlertContext);
 
   useEffect(() => {
@@ -23,7 +23,7 @@ function AlertMessage({ message, type }) {
             damping: 10,
             duration: 0.3,
           }}
-          className="absolute top-[100px] text-xl font-[700] text-zinc-300 p-[16px] bg-emerald-500 z-10 rounded-lg"
+          className="fixed w-fit h-fit mx-auto inset-0 text-xl font-[700] text-black p-[16px] bg-emerald-500 flex items-center justify-center z-10 rounded-lg"
         >
           {message}
         </motion.div>
@@ -42,7 +42,7 @@ function AlertMessage({ message, type }) {
             damping: 10,
             duration: 0.3,
           }}
-          className="absolute top-[100px] text-xl font-[700] text-zinc-300 p-[16px] bg-rose-500 z-10 rounded-lg"
+          className="fixed top-[100px] text-xl font-[700] text-zinc-300 p-[16px] bg-rose-500 z-10 rounded-lg"
         >
           {message}
         </motion.div>
@@ -50,5 +50,3 @@ function AlertMessage({ message, type }) {
     );
   }
 }
-
-export default AlertMessage;

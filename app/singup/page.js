@@ -7,6 +7,7 @@ import Link from "next/link";
 import AlertContext from "../api/context/alertContext";
 import AlertMessage from "../components/alert/AlertMessage";
 import { motion } from "framer-motion";
+import ActionButton from "../components/buttons/ActionButton";
 
 const validateName = (name) => {
   if (!name) {
@@ -20,13 +21,13 @@ const validatePassword = (password) => {
   if (!password) {
     return "Password is required";
   } else if (password.length < 8) {
-    return "Password must be at least 6 characters";
+    return "Password must be at least 8 characters";
   } else {
     return "";
   }
 };
 
-export default function Home() {
+export default function Page() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -164,7 +165,7 @@ export default function Home() {
         initial={{ opacity: 0, top: 60 }}
         animate={{ opacity: 1, top: 0 }}
         onSubmit={singInForm}
-        className="relative w-[600px] h-[550px] flex flex-col gap-[30px] bg-[#18181b] p-[24px] rounded-xl border-[1px] border-black"
+        className="relative w-[100vw] h-[100vh] md:w-[600px] md:max-h-[550px] md:min-h-[550px] flex flex-col gap-[25px] bg-[#18181b] p-[24px] md:rounded-xl border-[1px] border-black"
       >
         <div className="flex flex-col gap-[60px] h-[100%]">
           <div className="flex flex-col gap-[20px]">
@@ -221,12 +222,7 @@ export default function Home() {
             </div>
           </div>
           <div className="flex flex-col gap-[20px]">
-            <button
-              disabled={isSubmitted}
-              className="w-full py-[10px] px-4 rounded-lg bg-slate-300 text-black font-semibold flex items-center justify-center hover:bg-slate-400 transition duration-200 ease-in-out"
-            >
-              Sing up
-            </button>
+            <ActionButton text="Sing up" type="submit" disable={isSubmitted} />
 
             <div className="flex items-center justify-between">
               <Link className="text-zinc-300 font-[700]" href="/">

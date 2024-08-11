@@ -1,16 +1,20 @@
 "use client";
-import axios from "axios";
-import { redirect } from "next/navigation";
-import Link from "next/link";
-import { useContext, useEffect, useState } from "react";
 
 import { AuthContextProvider } from "./api/context/authContext";
 import Navbar from "./components/Navbar/Navbar";
+import Blogs from "./components/blogs/Blogs";
+import { AlertContextProvider } from "./api/context/alertContext";
+import { BlogsContextProvider } from "./api/context/blogsContext";
 
 export default function Home() {
   return (
     <AuthContextProvider>
-      <Navbar />
+      <AlertContextProvider>
+        <BlogsContextProvider>
+          <Navbar />
+          <Blogs />
+        </BlogsContextProvider>
+      </AlertContextProvider>
     </AuthContextProvider>
   );
 }

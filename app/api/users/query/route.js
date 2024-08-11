@@ -21,28 +21,47 @@ export async function GET(req) {
       .select("*")
       .eq("email", user.email);
 
-    let { data: userData_google, error_google } = await supabase
-      .from("users(login with google)")
-      .select("*")
-      .eq("email", user.email);
-
     if (error) {
       return NextResponse.json(
-        { message: "authentication fail" },
+        { message: "Get users fail maybe wrong data incoming" },
         { status: 400 }
       );
     }
 
-    if (!userData[0]) {
-      console.log(1);
-      return NextResponse.json({ data: userData_google }, { status: 200 });
-    } else {
-      console.log(2);
-      return NextResponse.json({ data: userData }, { status: 200 });
-    }
+    return NextResponse.json({ data: userData }, { status: 200 });
   } catch {
     return NextResponse.json(
-      { message: "Authentication failed" },
+      { message: "Get users fail bacause database issue" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(req) {
+  try {
+    const body = await req.json();
+
+    const { email, name, image_url } = body;
+
+    const { data, error } = await supabase
+      .from("users")
+      .update({ email, name, image_url })
+      .eq("email", email)
+      .select();
+
+    if (error) {
+      return NextResponse.json(
+        { message: "Could not update profile because database issue" },
+        { status: 200 }
+      );
+    }
+    return NextResponse.json(
+      { message: "Profile update successfully" },
+      { status: 200 }
+    );
+  } catch {
+    return NextResponse.json(
+      { message: "Could not update profile because database issue" },
       { status: 500 }
     );
   }

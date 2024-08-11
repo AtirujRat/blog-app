@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import AlertMessage from "../components/alert/AlertMessage";
 import AlertContext from "../api/context/alertContext";
 import dynamic from "next/dynamic";
+import ActionButton from "../components/buttons/ActionButton";
 const GoogleLogin = dynamic(() => import("react-google-login"), {
   ssr: false,
 });
@@ -20,7 +21,7 @@ export default function Home() {
   const [alertType, setAlertType] = useState();
 
   const router = useRouter();
-  const { onSuccess, onFailure } = useContext(AuthContext);
+  const { onFailure, getUserEmail } = useContext(AuthContext);
   const { isAlertOpened, setIsAlertOpened } = useContext(AlertContext);
 
   const clientId =
@@ -41,6 +42,37 @@ export default function Home() {
       });
     }
   }, []);
+
+  async function onSuccess(res) {
+    const getEmail = await getUserEmail();
+
+    console.log(res.profileObj.imageUrl);
+
+    if (!getEmail.includes(res.profileObj.email)) {
+      await axios.post("/api/users/singup", {
+        email: res.profileObj.email,
+        password: res.profileObj.email,
+        name: res.profileObj.name,
+        image_url: res.profileObj.imageUrl,
+      });
+    }
+
+    try {
+      const users = await axios.post("/api/users/login", {
+        email: res.profileObj.email,
+        password: res.profileObj.email,
+        name: res.profileObj.name,
+        image_url: res.profileObj.imageUrl,
+      });
+      localStorage.setItem("token", users.data.token);
+
+      router.push("/");
+    } catch {
+      setAlertMessage("Email already exits.");
+      setAlertType("error");
+      setIsAlertOpened(true);
+    }
+  }
 
   async function loginForm(e) {
     e.preventDefault();
@@ -67,7 +99,7 @@ export default function Home() {
         initial={{ opacity: 0, top: 60 }}
         animate={{ opacity: 1, top: 0 }}
         onSubmit={loginForm}
-        className="relative w-[600px] h-[550px] flex flex-col gap-[25px] bg-[#18181b] p-[24px] rounded-xl border-[1px] border-black"
+        className="relative w-[100vw] h-[100vh] md:w-[600px] md:max-h-[550px] md:min-h-[550px] flex flex-col gap-[25px] bg-[#18181b] p-[24px] md:rounded-xl border-[1px] border-black"
       >
         <div className="flex flex-col justify-between h-[90%]">
           <div className="flex flex-col gap-[20px]">
@@ -96,9 +128,7 @@ export default function Home() {
             </div>
           </div>
           <div className="flex flex-col gap-[20px]">
-            <button className="w-full py-[10px] px-4 rounded-lg bg-slate-300 text-black font-semibold flex items-center justify-center hover:bg-slate-400 transition duration-200 ease-in-out">
-              Login
-            </button>
+            <ActionButton text="Login" type="submit" />
 
             <div>
               <GoogleLogin
@@ -117,7 +147,7 @@ export default function Home() {
                       alt="Google Logo"
                       className="w-5 mr-2"
                     />
-                    Sign in with Google
+                    Sign up with Google
                   </button>
                 )}
               />
@@ -127,7 +157,7 @@ export default function Home() {
                 Back to home
               </Link>
               <Link className="text-zinc-300 font-[700]" href="/singup">
-                Sing In
+                Sing up
               </Link>
             </div>
           </div>

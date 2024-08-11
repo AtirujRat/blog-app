@@ -6,14 +6,14 @@ export async function POST(req) {
   try {
     const body = await req.json();
 
-    const { email, name, password } = body;
+    const { email, name, password, image_url } = body;
 
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     const { data, error } = await supabase
       .from("users")
-      .insert([{ email, name, password: hashedPassword }])
+      .insert([{ email, name, password: hashedPassword, image_url }])
       .select();
 
     if (error) {
