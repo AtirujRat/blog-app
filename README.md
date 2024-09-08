@@ -7,6 +7,7 @@ That's why I started build this project.
 ## Features
 
 - Register
+- bcrypt password
 - Login
 - Login with google
 - jwt token
